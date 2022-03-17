@@ -1,0 +1,183 @@
+﻿@page "/grid"
+
+@using System.ComponentModel.DataAnnotations
+
+<TelerikGrid Data=@GridData EditMode="@GridEditMode.Inline" Height="450px"
+             ShowColumnMenu="true" Width="100%" FilterMode="@GridFilterMode.FilterMenu"
+             Pageable="true" PageSize="10" Resizable="true" Reorderable="true"
+             OnCreate="@CreateHandler" OnDelete="@DeleteHandler" OnUpdate="@UpdateHandler">
+    <GridToolBar>
+        <GridCommandButton Command="Add" Icon="add">Add Product</GridCommandButton>
+    </GridToolBar>
+    <GridColumns>
+        <GridColumn Field="@nameof(Product.ProductId)" Locked="true" Title="ID" Width="90px" ShowColumnMenu="false" ShowColumnChooser="false" />
+        <GridColumn Field=@nameof(Product.ProductName) Width="260px" Title="Product Name" />
+        <GridColumn Field=@nameof(Product.Cost) Title="Price" Width="140px" DisplayFormat="{0:C2}" />
+        <GridColumn Field=@nameof(Product.Quantity) Width="150px" />
+        <GridColumn Field=@nameof(Product.Available) Title="In Stock" Width="150px">
+            <Template>
+                @{
+                    bool isInStock = (context as Product).Available;
+
+                    if (isInStock)
+                    {
+                        <span class="k-badge k-badge-md k-badge-solid k-badge-success k-badge-rounded">Available</span>
+                    }
+                    else
+                    {
+                        <span class="k-badge k-badge-md k-badge-solid k-badge-error k-badge-rounded">Not Available</span>
+                    }
+                }
+            </Template>
+        </GridColumn>
+        <GridCommandColumn Width="250px" Locked="true" Lockable="false" Resizable="false">
+            <GridCommandButton Command="Edit" Icon="edit">Edit</GridCommandButton>
+            <GridCommandButton Command="Delete" Icon="delete">Delete</GridCommandButton>
+            <GridCommandButton Command="Save" Icon="save" ShowInEdit="true">Save</GridCommandButton>
+            <GridCommandButton Command="Cancel" Icon="cancel" ShowInEdit="true">Cancel</GridCommandButton>
+        </GridCommandColumn>
+    </GridColumns>
+</TelerikGrid>
+
+@code {
+    public List<Product> GridData { get; set; }
+    int lastId = 0;
+
+    protected override Task OnInitializedAsync()
+    {
+        GridData = GetProducts();
+
+        return base.OnInitializedAsync();
+    }
+
+    public List<Product> GetProducts()
+	{		
+        List<Product> data = new List<Product>();
+		
+		data.Add(new Product() { ProductId = 1, ProductName = "Chai", CategoryId = 1, CategoryName = CategoryName.Beverages, Cost = 18m, Quantity = "10 boxes x 20 bags" });
+		data.Add(new Product() { ProductId = 2, ProductName = "Chang", CategoryId = 1, CategoryName = CategoryName.Beverages, Cost = 19m, Quantity = "24 - 12 oz bottles", Available = false });
+		data.Add(new Product() { ProductId = 3, ProductName = "Guaraná Fantástica", CategoryId = 1, CategoryName = CategoryName.Beverages, Cost = 4.5m, Quantity = "12 - 355 ml cans" });
+		data.Add(new Product() { ProductId = 4, ProductName = "Sasquatch Ale", CategoryId = 1, CategoryName = CategoryName.Beverages, Cost = 14m, Quantity = "24 - 12 oz bottles" });
+		data.Add(new Product() { ProductId = 5, ProductName = "Steeleye Stout", CategoryId = 1, CategoryName = CategoryName.Beverages, Cost = 18.99m, Quantity = "24 - 12 oz bottles", Available = false });
+		data.Add(new Product() { ProductId = 6, ProductName = "Côte de Blaye", CategoryId = 1, CategoryName = CategoryName.Beverages, Cost = 263.5m, Quantity = "12 - 75 cl bottles" });
+		data.Add(new Product() { ProductId = 7, ProductName = "Chartreuse verte", CategoryId = 1, CategoryName = CategoryName.Beverages, Cost = 18m, Quantity = "750 cc per bottle" });
+		data.Add(new Product() { ProductId = 8, ProductName = "Ipoh Coffee", CategoryId = 1, CategoryName = CategoryName.Beverages, Cost = 46m, Quantity = "16 - 500 g tins" });
+				
+		data.Add(new Product() { ProductId = 9, ProductName = "Aniseed Syrup", CategoryId = 2, CategoryName = CategoryName.Condiments, Cost = 10m, Quantity = "12 - 550 ml bottles" });
+		data.Add(new Product() { ProductId = 10, ProductName = "Chef Anton's Cajun Seasoning", CategoryId = 2, CategoryName = CategoryName.Condiments, Cost = 22.80m, Quantity = "48 - 6 oz jars", Available = false });
+		data.Add(new Product() { ProductId = 11, ProductName = "Chef Anton's Gumbo Mix", CategoryId = 2, CategoryName = CategoryName.Condiments, Cost = 21.35m, Quantity = "36 boxes" });
+		data.Add(new Product() { ProductId = 12, ProductName = "Grandma's Boysenberry Spread", CategoryId = 2, CategoryName = CategoryName.Condiments, Cost = 25m, Quantity = "12 - 8 oz jars" });
+		data.Add(new Product() { ProductId = 13, ProductName = "Northwoods Cranberry Sauce", CategoryId = 2, CategoryName = CategoryName.Condiments, Cost = 40m, Quantity = "12 - 12 oz jars" });
+		data.Add(new Product() { ProductId = 14, ProductName = "Genen Shouyu", CategoryId = 2, CategoryName = CategoryName.Condiments, Cost = 15.50m, Quantity = "24 - 250 ml bottles" });
+		data.Add(new Product() { ProductId = 15, ProductName = "Gula Malacca", CategoryId = 2, CategoryName = CategoryName.Condiments, Cost = 19.45m, Quantity = "20 - 2 kg bags", Available = false });
+		data.Add(new Product() { ProductId = 16, ProductName = "Vegie-spread", CategoryId = 2, CategoryName = CategoryName.Condiments, Cost = 43.90m, Quantity = "15 - 625 g jars" });
+
+		
+		data.Add(new Product() { ProductId = 17, ProductName = "Pavlova", CategoryId = 3, CategoryName = CategoryName.Confections, Cost = 17.45m, Quantity = "100 - 250 g bags", Available = false });
+		data.Add(new Product() { ProductId = 18, ProductName = "Teatime Chocolate Biscuits", CategoryId = 3, CategoryName = CategoryName.Confections, Cost = 9.20m, Quantity = "20 - 450 g glasses" });
+		data.Add(new Product() { ProductId = 19, ProductName = "Sir Rodney's Marmalade", CategoryId = 3, CategoryName = CategoryName.Confections, Cost = 81.00m, Quantity = "24 pkgs. x 4 pieces" });
+		data.Add(new Product() { ProductId = 20, ProductName = "Sir Rodney's Scones", CategoryId = 3, CategoryName = CategoryName.Confections, Cost = 10.00m, Quantity = "30 gift boxes", Available = false });
+		data.Add(new Product() { ProductId = 21, ProductName = "NuNuCa Nuß-Nougat-Creme", CategoryId = 3, CategoryName = CategoryName.Confections, Cost = 14.00m, Quantity = "10 boxes x 12 pieces" });
+		data.Add(new Product() { ProductId = 22, ProductName = "Gumbär Gummibärchen", CategoryId = 3, CategoryName = CategoryName.Confections, Cost = 31.23m, Quantity = "32 - 500 g boxes" });
+		data.Add(new Product() { ProductId = 23, ProductName = "Schoggi Schokolade", CategoryId = 3, CategoryName = CategoryName.Confections, Cost = 43.9m, Quantity = "100 - 100 g pieces" });
+		data.Add(new Product() { ProductId = 24, ProductName = "Zaanse koeken", CategoryId = 3, CategoryName = CategoryName.Confections, Cost = 9.5m, Quantity = "10 - 4 oz boxes", Available = false });
+
+		
+		data.Add(new Product() { ProductId = 25, ProductName = "Queso Cabrales", CategoryId = 4, CategoryName = CategoryName.DairyProducts, Cost = 21m, Quantity = "1 kg pkg" });
+		data.Add(new Product() { ProductId = 26, ProductName = "Mascarpone Fabioli", CategoryId = 4, CategoryName = CategoryName.DairyProducts, Cost = 32m, Quantity = "24 - 200 g pkgs", Available = false });
+		data.Add(new Product() { ProductId = 27, ProductName = "Geitost", CategoryId = 4, CategoryName = CategoryName.DairyProducts, Cost = 2.5m, Quantity = "500 g" });
+		data.Add(new Product() { ProductId = 28, ProductName = "Raclette Courdavault", CategoryId = 4, CategoryName = CategoryName.DairyProducts, Cost = 55m, Quantity = "5 kg pkg" });
+		data.Add(new Product() { ProductId = 29, ProductName = "Camembert Pierrot", CategoryId = 4, CategoryName = CategoryName.DairyProducts, Cost = 34m, Quantity = "15 - 300 g rounds", Available = false });
+		data.Add(new Product() { ProductId = 30, ProductName = "Gudbrandsdalsost", CategoryId = 4, CategoryName = CategoryName.DairyProducts, Cost = 36m, Quantity = "10 kg pkg" });
+		data.Add(new Product() { ProductId = 31, ProductName = "Flotemysost", CategoryId = 4, CategoryName = CategoryName.DairyProducts, Cost = 21.5m, Quantity = "10 - 500 g pkgs" });
+		data.Add(new Product() { ProductId = 32, ProductName = "Mozzarella di Giovanni", CategoryId = 4, CategoryName = CategoryName.DairyProducts, Cost = 34.8m, Quantity = "24 - 200 g pkgs" });
+		
+		data.Add(new Product() { ProductId = 33, ProductName = "Gustaf's Knäckebröd", CategoryId = 5, CategoryName = CategoryName.Grains, Cost = 21m, Quantity = "24 - 500 g pkgs" });
+		data.Add(new Product() { ProductId = 34, ProductName = "Tunnbröd", CategoryId = 5, CategoryName = CategoryName.Grains, Cost = 9m, Quantity = "12 - 250 g pkgs", Available = false });
+		data.Add(new Product() { ProductId = 35, ProductName = "Singaporean Hokkien Fried Mee", CategoryId = 5, CategoryName = CategoryName.Grains, Cost = 14m, Quantity = "32 - 1 kg pkgs" });
+		data.Add(new Product() { ProductId = 36, ProductName = "Filo Mix", CategoryId = 5, CategoryName = CategoryName.Grains, Cost = 7m, Quantity = "16 - 2 kg boxes" });
+		data.Add(new Product() { ProductId = 37, ProductName = "Gnocchi di nonna Alice", CategoryId = 5, CategoryName = CategoryName.Grains, Cost = 38m, Quantity = "24 - 250 g pkgs" });
+		data.Add(new Product() { ProductId = 38, ProductName = "Ravioli Angelo", CategoryId = 5, CategoryName = CategoryName.Grains, Cost = 19.5m, Quantity = "24 - 250 g pkgs" });
+		data.Add(new Product() { ProductId = 39, ProductName = "Wimmers gute Semmelknödel", CategoryId = 5, CategoryName = CategoryName.Grains, Cost = 33.25m, Quantity = "20 bags x 4 pieces" });
+
+		
+		data.Add(new Product() { ProductId = 40, ProductName = "Mishi Kobe Niku", CategoryId = 6, CategoryName = CategoryName.Meat, Cost = 97m, Quantity = "24 boxes x 2 pies" });
+		data.Add(new Product() { ProductId = 41, ProductName = "Alice Mutton", CategoryId = 6, CategoryName = CategoryName.Meat, Cost = 39m, Quantity = "16 pies" });
+		data.Add(new Product() { ProductId = 42, ProductName = "Thüringer Rostbratwurst", CategoryId = 6, CategoryName = CategoryName.Meat, Cost = 123.99m, Quantity = "48 pieces" });
+		data.Add(new Product() { ProductId = 43, ProductName = "Perth Pasties", CategoryId = 6, CategoryName = CategoryName.Meat, Cost = 32.8m, Quantity = "50 bags x 30 sausgs", Available = false });
+		data.Add(new Product() { ProductId = 44, ProductName = "Tourtière", CategoryId = 6, CategoryName = CategoryName.Meat, Cost = 7.45m, Quantity = "20 - 1 kg tins" });
+		data.Add(new Product() { ProductId = 45, ProductName = "Pâté chinois", CategoryId = 6, CategoryName = CategoryName.Meat, Cost = 24.00m, Quantity = "18 - 500 g pkgs" });
+		data.Add(new Product() { ProductId = 46, ProductName = "Uncle Bob's Organic Dried Pears", CategoryId = 6, CategoryName = CategoryName.Meat, Cost = 30m, Quantity = "12 - 1 lb pkgs" });
+		data.Add(new Product() { ProductId = 47, ProductName = "Tofu", CategoryId = 6, CategoryName = CategoryName.Meat, Cost = 23.25m, Quantity = "40 - 100 g pkgs", Available = false });
+		
+		data.Add(new Product() { ProductId = 48, ProductName = "Ikura", CategoryId = 7, CategoryName = CategoryName.Seafood, Cost = 31m, Quantity = "12 - 200 ml jars" });
+		data.Add(new Product() { ProductId = 49, ProductName = "Konbu", CategoryId = 7, CategoryName = CategoryName.Seafood, Cost = 6m, Quantity = "2 kg box" });
+		data.Add(new Product() { ProductId = 50, ProductName = "Carnarvon Tigers", CategoryId = 7, CategoryName = CategoryName.Seafood, Cost = 62.5m, Quantity = "16 kg pkg", Available = false });
+		data.Add(new Product() { ProductId = 51, ProductName = "Nord-Ost Matjeshering", CategoryId = 7, CategoryName = CategoryName.Seafood, Cost = 25.89m, Quantity = "10 - 200 g glasses", Available = false });
+		data.Add(new Product() { ProductId = 52, ProductName = "Inlagd Sill", CategoryId = 7, CategoryName = CategoryName.Seafood, Cost = 19m, Quantity = "24 - 250 g jars" });
+		data.Add(new Product() { ProductId = 53, ProductName = "Gravad lax", CategoryId = 7, CategoryName = CategoryName.Seafood, Cost = 97m, Quantity = "12 - 500 g pkgs" });
+		data.Add(new Product() { ProductId = 54, ProductName = "Jack's New England Clam Chowder", CategoryId = 7, CategoryName = CategoryName.Seafood, Cost = 9.65m, Quantity = "12 - 12 oz cans" });
+		data.Add(new Product() { ProductId = 55, ProductName = "Spegesild", CategoryId = 7, CategoryName = CategoryName.Seafood, Cost = 26m, Quantity = "4 - 450 g glasses" });
+
+		return data;
+	}
+
+    public class Product
+	{
+		public int ProductId { get; set; }
+		public string ProductName { get; set; }
+		public int CategoryId { get; set; }
+		public CategoryName CategoryName { get; set; }
+		public decimal Cost { get; set; }
+		public string Quantity { get; set; }
+		public bool Available { get; set; }
+
+		public Product()
+		{
+			Available = true;
+		}
+	}
+
+	public enum CategoryName
+	{
+		Beverages,
+		Condiments,
+		Confections,
+		[Display(Name = "Dairy Products")]
+		DairyProducts,
+		[Display(Name = "Grains/Cereals")]
+		Grains,
+		[Display(Name = "Meat/Poultry")]
+		Meat,
+		Seafood
+	}
+
+    private void CreateHandler(GridCommandEventArgs args)
+    {
+        Product product = (Product)args.Item;
+
+        product.ProductId = ++lastId;
+        GridData.Insert(0, product);
+    }
+
+    private void DeleteHandler(GridCommandEventArgs args)
+    {
+        GridData.Remove((Product)args.Item);
+    }
+
+    private void UpdateHandler(GridCommandEventArgs args)
+    {
+        Product product = (Product)args.Item;
+
+        var existing = GridData.FirstOrDefault(p => p.ProductId == product.ProductId);
+
+        if (existing != null)
+        {
+            existing.ProductName = product.ProductName;
+            existing.Cost = product.Cost;
+            existing.CategoryName = product.CategoryName;
+            existing.Quantity = product.Quantity;
+            existing.Available = product.Available;
+        }
+    }
+}
